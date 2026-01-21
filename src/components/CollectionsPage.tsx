@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addToCart, openCart } from '../store/cartSlice';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, X } from 'lucide-react';
+import { Slider } from './ui/Slider';
 
 interface CollectionsPageProps {
   initialCategory?: string;
@@ -13,13 +14,22 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'All');
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('M');
-
+  const carouselSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: false,
+    arrows: true,
+    adaptiveHeight: true
+  };
   // Get unique categories
   const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
 
   // Filter products by category
-  const filteredProducts = selectedCategory === 'All' 
-    ? products 
+  const filteredProducts = selectedCategory === 'All'
+    ? products
     : products.filter(p => p.category === selectedCategory);
 
   const handleAddToCart = (product: any) => {
@@ -49,11 +59,10 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-2 text-sm uppercase tracking-wider whitespace-nowrap transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-black text-white'
-                    : 'bg-white border border-black/20 hover:border-black'
-                }`}
+                className={`px-6 py-2 text-sm uppercase tracking-wider whitespace-nowrap transition-colors ${selectedCategory === category
+                  ? 'bg-black text-white'
+                  : 'bg-white border border-black/20 hover:border-black'
+                  }`}
               >
                 {category}
               </button>
@@ -75,7 +84,7 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
               {filteredProducts.map((product) => (
                 <div key={product.id} className="group">
                   {/* Product Image */}
-                  <div 
+                  <div
                     className="relative overflow-hidden mb-4 bg-gray-100 cursor-pointer"
                     onClick={() => setSelectedProduct(product.id)}
                   >
@@ -86,7 +95,7 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    
+
                     {/* Quick Add Overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-end justify-center pb-6 opacity-0 group-hover:opacity-100">
                       <button
@@ -117,38 +126,50 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
         </div>
       </section>
 
-      {/* Product Quick View Modal */}
       {selectedProduct && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setSelectedProduct(null)}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
+            <div className="bg-white max-w-5xl w-full max-h-[90vh] overflow-y-auto relative">
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
               {(() => {
                 const product = products.find(p => p.id === selectedProduct);
                 if (!product) return null;
 
                 return (
                   <div className="grid md:grid-cols-2 gap-8 p-8">
-                    {/* Product Images */}
-                    <div className="space-y-4">
-                      {product.images.map((image, index) => (
-                        <div key={index} className="bg-gray-100">
-                          <img
-                            src={image}
-                            alt={`${product.title} ${index + 1}`}
-                            className="w-full h-auto object-cover"
-                          />
-                        </div>
-                      ))}
+                    {/* Product Carousel */}
+                    <div className="carousel-container max-w-[220px] mx-auto">
+                      <Slider {...carouselSettings}>
+                        {product?.images?.map((image, index) => (
+                          <div key={index}>
+                            <div className="w-[220px] h-[280px] bg-gray-100 overflow-hidden rounded-lg">
+                              <img
+                                src={image}
+                                alt={`${product.title} ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </Slider>
                     </div>
 
                     {/* Product Details */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col py-4">
+                      <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+                        {product.category}
+                      </p>
                       <h2 className="text-3xl tracking-tighter mb-2">{product.title}</h2>
-                      <p className="text-gray-500 mb-4">{product.category}</p>
                       <p className="text-2xl mb-6">{product.price}</p>
 
                       {product.description && (
@@ -161,15 +182,15 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
                       <div className="mb-8">
                         <h3 className="text-sm uppercase tracking-wider mb-3">Select Size</h3>
                         <div className="grid grid-cols-5 gap-2">
+
                           {['XS', 'S', 'M', 'L', 'XL'].map((size) => (
                             <button
                               key={size}
                               onClick={() => setSelectedSize(size)}
-                              className={`py-3 text-sm border transition-colors ${
-                                selectedSize === size
-                                  ? 'bg-black text-white border-black'
-                                  : 'border-black/20 hover:border-black'
-                              }`}
+                              className={`py-3 text-sm border transition-colors ${selectedSize === size
+                                ? 'bg-black text-white border-black'
+                                : 'border-black/20 hover:border-black'
+                                }`}
                             >
                               {size}
                             </button>
