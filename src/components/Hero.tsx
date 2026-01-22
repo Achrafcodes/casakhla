@@ -21,9 +21,9 @@ export function Hero({ image = heroImage }: HeroProps) {
       {/* Content */}
       <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
         <div className="max-w-3xl">
-          <div className="text-white/80 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-4 sm:mb-6 text-xs sm:text-sm">
+          {/* <div className="text-white/80 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-4 sm:mb-6 text-xs sm:text-sm">
             Spring / Summer 2026
-          </div>
+          </div> */}
           <h1 className="text-white mb-6 sm:mb-8 leading-[0.95]">
             <span className="block text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-light tracking-tighter">
               Identify

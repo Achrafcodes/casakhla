@@ -1,5 +1,5 @@
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -26,9 +26,9 @@ const isAdminEmail = (email: string): boolean => {
 
 // Sign up with email and password
 export const signUpWithEmail = async (
-  email: string, 
-  password: string, 
-  firstName?: string, 
+  email: string,
+  password: string,
+  firstName?: string,
   lastName?: string,
   phoneNumber?: string
 ): Promise<{ user: FirebaseUser; userData: UserData }> => {
@@ -64,7 +64,7 @@ export const signUpWithEmail = async (
 
 // Sign in with email and password
 export const signInWithEmail = async (
-  email: string, 
+  email: string,
   password: string
 ): Promise<{ user: FirebaseUser; userData: UserData }> => {
   try {
@@ -73,7 +73,7 @@ export const signInWithEmail = async (
 
     // Get user data from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
-    
+
     let userData: UserData;
     if (userDoc.exists()) {
       userData = userDoc.data() as UserData;

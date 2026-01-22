@@ -1,6 +1,8 @@
 import { X, Plus, Minus, ShoppingBag as BagIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { closeCart, removeFromCart, updateQuantity } from '../store/cartSlice';
+import { createOrder } from '../firebase/firestoreOrders';
+import { useNavigate } from 'react-router-dom'; // if using React Router for login redirect
 
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
@@ -83,9 +85,9 @@ export function ShoppingBag() {
                         <X className="w-4 h-4" />
                       </button>
                     </div>
-                    
+
                     <p className="text-sm text-gray-500 mb-2">{item.category}</p>
-                    
+
                     {item.selectedSize && (
                       <p className="text-sm text-gray-600 mb-2">Size: {item.selectedSize}</p>
                     )}
