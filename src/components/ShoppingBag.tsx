@@ -1,10 +1,15 @@
 import { X, Plus, Minus, ShoppingBag as BagIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { closeCart, removeFromCart, updateQuantity } from '../store/cartSlice';
+import { closeCart, removeFromCart, updateQuantity, clearCart } from '../store/cartSlice';
+import { auth } from '../lib/firebase';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
   const { items, isOpen } = useAppSelector((state) => state.cart);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const calculateTotal = () => {
     return items.reduce((total, item) => {
@@ -18,6 +23,70 @@ export function ShoppingBag() {
       dispatch(removeFromCart({ id, size }));
     } else {
       dispatch(updateQuantity({ id, size, quantity: newQuantity }));
+    }
+  };
+
+  const handleCheckout = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Please sign in to checkout');
+      return;
+    }
+
+    if (items.length === 0) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Prepare order data
+      const orderData = {
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        userId: user.uid,
+        userEmail: user.email,
+        items: items.map(item => ({
+          productId: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          image: item.images[0],
+          category: item.category
+        })),
+        total: calculateTotal(),
+        status: 'pending',
+        shippingAddress: {
+          fullName: user.displayName || '',
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: ''
+        },
+        paymentMethod: 'pending',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      };
+
+      // Create order in database
+      await addDoc(collection(db, 'orders'), orderData);
+
+      // Clear cart after successful order
+      dispatch(clearCart());
+
+      // Show success message
+      alert('Order placed successfully! You will receive a confirmation email shortly.');
+
+      // Close cart
+      dispatch(closeCart());
+    } catch (error) {
+      console.error('Error processing checkout:', error);
+      alert('Failed to process order. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -132,8 +201,12 @@ export function ShoppingBag() {
             </p>
 
             {/* Checkout Button */}
-            <button className="w-full bg-black text-white py-4 text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors">
-              Proceed to Checkout
+            <button
+              onClick={handleCheckout}
+              disabled={isProcessing}
+              className="w-full bg-black text-white py-4 text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
             </button>
 
             <button
@@ -142,9 +215,10 @@ export function ShoppingBag() {
             >
               Continue Shopping
             </button>
+            <button onClick={console.log(auth.currentUser)} >nothing</button>
           </div>
         )}
-      </div>
+      </div >
     </>
   );
 }
