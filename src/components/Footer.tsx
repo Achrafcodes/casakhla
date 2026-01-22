@@ -51,21 +51,7 @@ export function Footer() {
                   About Us
                 </a>
               </li>
-              <li>
-                <a href="#" className="hover:text-black transition-colors">
-                  Sustainability
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-black transition-colors">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-black transition-colors">
-                  Press
-                </a>
-              </li>
+
             </ul>
           </div>
 

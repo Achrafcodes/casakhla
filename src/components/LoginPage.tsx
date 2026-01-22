@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginWithEmail, loginWithGoogle } from '../store/authSlice';
 import brandImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
@@ -36,7 +36,14 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen relative bg-white flex">
+      {/* Back to Home Button */}
+      <button
+        onClick={() => onNavigate?.('home')}
+        className="fixed ml-24  w-24 flex items-center justify-center top-16 left-4 flex items-center text-gray-600 hover:text-black transition-colors z-10 text-lg shadow-md rounded-lg p-2"
+      >
+        <ArrowLeft className="w-12 h-12 text-black" />
+      </button>
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
@@ -121,25 +128,10 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               <span className="px-4 bg-white text-gray-500 uppercase tracking-wider">Or</span>
             </div>
           </div>
+          {/* Back to Home Button */}
 
-          {/* Social Sign In */}
-          <div className="space-y-3">
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Continue with Google
-            </button>
-            <button
-              type="button"
-              disabled={loading}
-              className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Continue with Apple
-            </button>
-          </div>
+
+
 
           {/* Sign Up Link */}
           <div className="mt-8 text-center text-sm">

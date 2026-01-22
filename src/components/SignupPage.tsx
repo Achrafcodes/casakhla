@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { signupWithEmail, loginWithGoogle } from '../store/authSlice';
 import brandImage from 'figma:asset/877531fbc80ee4389c993063c1dd6ca4982ac9d4.png';
@@ -31,7 +31,7 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate password match
     if (formData.password !== formData.confirmPassword) {
       setValidationError('Passwords do not match!');
@@ -43,16 +43,16 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
       setValidationError('Password must be at least 6 characters long');
       return;
     }
-    
+
     try {
-      await dispatch(signupWithEmail({ 
-        email: formData.email, 
+      await dispatch(signupWithEmail({
+        email: formData.email,
         password: formData.password,
-        firstName: formData.firstName, 
+        firstName: formData.firstName,
         lastName: formData.lastName,
         phoneNumber: formData.phoneNumber
       })).unwrap();
-      
+
       // Navigate to home after successful signup
       onNavigate?.('home');
     } catch (err) {
@@ -73,6 +73,12 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
   return (
     <div className="min-h-screen bg-white flex">
       {/* Left Side - Image */}
+      <button
+        onClick={() => onNavigate?.('home')}
+        className="fixed ml-24  w-24 flex items-center justify-center top-16 left-4 flex items-center text-gray-600 hover:text-black transition-colors z-10 text-lg shadow-md rounded-lg p-2"
+      >
+        <ArrowLeft className="w-12 h-12 text-white" />
+      </button>
       <div className="hidden lg:block lg:w-1/2 relative bg-black">
         <img
           src={brandImage}
@@ -243,24 +249,7 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
             </div>
           </div>
 
-          {/* Social Sign Up */}
-          <div className="space-y-3">
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Continue with Google
-            </button>
-            <button
-              type="button"
-              disabled={loading}
-              className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Continue with Apple
-            </button>
-          </div>
+
 
           {/* Login Link */}
           <div className="mt-8 text-center text-sm">

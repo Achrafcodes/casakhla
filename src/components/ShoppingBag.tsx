@@ -1,24 +1,48 @@
-import { X, Plus, Minus, ShoppingBag as BagIcon } from 'lucide-react';
-import { useState } from 'react';
+import {
+  X,
+  Plus,
+  Minus,
+  ShoppingBag as ShoppingBagIcon,
+  CheckCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { closeCart, removeFromCart, updateQuantity, clearCart } from '../store/cartSlice';
+import {
+  closeCart,
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+} from '../store/cartSlice';
 import { auth } from '../lib/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
   const { items, isOpen } = useAppSelector((state) => state.cart);
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const calculateTotal = () => {
-    return items.reduce((total, item) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [orderId, setOrderId] = useState('');
+
+  /* -------------------- HELPERS -------------------- */
+  const calculateTotal = () =>
+    items.reduce((total, item) => {
       const price = parseFloat(item.price.replace('$', ''));
       return total + price * item.quantity;
     }, 0);
-  };
 
-  const handleQuantityChange = (id: string, size: string | undefined, newQuantity: number) => {
+  const handleQuantityChange = (
+    id: string,
+    size: string | undefined,
+    newQuantity: number
+  ) => {
     if (newQuantity < 1) {
       dispatch(removeFromCart({ id, size }));
     } else {
@@ -26,159 +50,159 @@ export function ShoppingBag() {
     }
   };
 
+  /* -------------------- CHECKOUT -------------------- */
   const handleCheckout = async () => {
     const user = auth.currentUser;
-
-    if (!user) {
-      alert('Please sign in to checkout');
-      return;
-    }
-
-    if (items.length === 0) {
-      return;
-    }
+    if (!user || items.length === 0) return;
 
     setIsProcessing(true);
 
     try {
-      // Prepare order data
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.exists() ? userDoc.data() : {};
+
       const orderData = {
-        email: user.email,
-        phoneNumber: user.phoneNumber,
         userId: user.uid,
-        userEmail: user.email,
-        items: items.map(item => ({
+        customerEmail: user.email || '',
+        customerName:
+          user.displayName ||
+          `${userData.firstName || ''} ${userData.lastName || ''}`.trim() ||
+          'N/A',
+        customerPhone: userData.phoneNumber || 'N/A',
+        items: items.map((item) => ({
           productId: item.id,
           title: item.title,
           price: item.price,
           quantity: item.quantity,
           selectedSize: item.selectedSize,
           image: item.images[0],
-          category: item.category
+          category: item.category,
         })),
-        total: calculateTotal(),
+        totalAmount: `$${calculateTotal().toFixed(2)}`,
         status: 'pending',
-        shippingAddress: {
-          fullName: user.displayName || '',
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: ''
-        },
         paymentMethod: 'pending',
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       };
 
-      // Create order in database
-      await addDoc(collection(db, 'orders'), orderData);
+      const docRef = await addDoc(collection(db, 'orders'), orderData);
 
-      // Clear cart after successful order
+      setOrderId(docRef.id.substring(0, 8).toUpperCase());
+      setShowSuccessModal(true);
       dispatch(clearCart());
-
-      // Show success message
-      alert('Order placed successfully! You will receive a confirmation email shortly.');
-
-      // Close cart
-      dispatch(closeCart());
-    } catch (error) {
-      console.error('Error processing checkout:', error);
-      alert('Failed to process order. Please try again.');
+    } catch (err) {
+      console.error(err);
+      alert('Checkout failed');
     } finally {
       setIsProcessing(false);
     }
   };
 
+  /* -------------------- AUTO CLOSE SUCCESS MODAL -------------------- */
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false);
+        dispatch(closeCart());
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal, dispatch]);
+
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Overlay */}
+    <div className='h-screen relative'>
+      {/* Cart Overlay */}
       <div
         className="fixed inset-0 bg-black/50 z-40"
         onClick={() => dispatch(closeCart())}
       />
 
-      {/* Shopping Bag Sidebar */}
+      {/* Cart Sidebar */}
       <div className="fixed right-0 top-0 h-full w-full sm:w-[400px] bg-white z-50 flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-black/10">
+        <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-2">
-            <BagIcon className="w-5 h-5" />
-            <h2 className="text-xl tracking-tighter">Shopping Bag</h2>
+            <ShoppingBagIcon className="w-5 h-5" />
+            <h2 className="text-xl">Shopping Bag</h2>
             <span className="text-sm text-gray-500">({items.length})</span>
           </div>
-          <button
-            onClick={() => dispatch(closeCart())}
-            className="hover:bg-gray-100 p-2 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={() => dispatch(closeCart())}>
+            <X />
           </button>
         </div>
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto p-6">
           {items.length === 0 ? (
-            <div className="text-center py-16">
-              <BagIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 mb-2">Your bag is empty</p>
-              <p className="text-sm text-gray-400">Add items to get started</p>
-            </div>
+            <p className="text-center text-gray-500">Your bag is empty</p>
           ) : (
             <div className="space-y-6">
               {items.map((item) => (
                 <div
                   key={`${item.id}-${item.selectedSize}`}
-                  className="flex gap-4 border-b border-black/5 pb-6"
+                  className="flex gap-4 border-b pb-6"
                 >
-                  {/* Product Image */}
-                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
-                    <img
-                      src={item.images[0]}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <img
+                    src={item.images[0]}
+                    alt={item.title}
+                    className="w-24 h-24 object-cover bg-gray-100"
+                  />
 
-                  {/* Product Details */}
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex justify-between mb-1">
-                      <h3 className="tracking-tight">{item.title}</h3>
+                  <div className="flex-1">
+                    <div className="flex justify-between">
+                      <h3>{item.title}</h3>
                       <button
-                        onClick={() => dispatch(removeFromCart({ id: item.id, size: item.selectedSize }))}
-                        className="text-gray-400 hover:text-black transition-colors"
+                        onClick={() =>
+                          dispatch(
+                            removeFromCart({
+                              id: item.id,
+                              size: item.selectedSize,
+                            })
+                          )
+                        }
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <p className="text-sm text-gray-500 mb-2">{item.category}</p>
-
                     {item.selectedSize && (
-                      <p className="text-sm text-gray-600 mb-2">Size: {item.selectedSize}</p>
+                      <p className="text-sm">Size: {item.selectedSize}</p>
                     )}
 
-                    <div className="flex items-center justify-between mt-auto">
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-3 border border-black/20">
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex items-center border">
                         <button
-                          onClick={() => handleQuantityChange(item.id, item.selectedSize, item.quantity - 1)}
-                          className="px-3 py-1 hover:bg-gray-100 transition-colors"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedSize,
+                              item.quantity - 1
+                            )
+                          }
+                          className="px-3"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-sm">{item.quantity}</span>
+                        <span className="px-2">{item.quantity}</span>
                         <button
-                          onClick={() => handleQuantityChange(item.id, item.selectedSize, item.quantity + 1)}
-                          className="px-3 py-1 hover:bg-gray-100 transition-colors"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedSize,
+                              item.quantity + 1
+                            )
+                          }
+                          className="px-3"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
-                      {/* Price */}
-                      <div className="text-sm">{item.price}</div>
+                      <span>{item.price}</span>
                     </div>
                   </div>
                 </div>
@@ -189,36 +213,42 @@ export function ShoppingBag() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-black/10 p-6 space-y-4">
-            {/* Subtotal */}
+          <div className="border-t p-6 space-y-4">
             <div className="flex justify-between text-lg">
-              <span className="tracking-tight">Subtotal</span>
-              <span className="tracking-tight">${calculateTotal().toFixed(2)}</span>
+              <span>Subtotal</span>
+              <span>${calculateTotal().toFixed(2)}</span>
             </div>
 
-            <p className="text-xs text-gray-500">
-              Shipping and taxes calculated at checkout
-            </p>
-
-            {/* Checkout Button */}
             <button
               onClick={handleCheckout}
               disabled={isProcessing}
-              className="w-full bg-black text-white py-4 text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-black text-white py-4 disabled:bg-gray-400"
             >
-              {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
+              {isProcessing ? 'Processing...' : 'Checkout'}
             </button>
-
-            <button
-              onClick={() => dispatch(closeCart())}
-              className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:border-black transition-colors"
-            >
-              Continue Shopping
-            </button>
-            <button onClick={console.log(auth.currentUser)} >nothing</button>
           </div>
         )}
-      </div >
-    </>
+      </div>
+      {showSuccessModal && (
+        <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-auto max-w-sm animate-scaleIn">
+            <div className="p-6 sm:p-8 text-center space-y-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-full mx-auto flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
+              </div>
+
+              <h2 className="text-base sm:text-lg md:text-xl font-bonld font-semibold">Order confirmed we will contact you as soon as possible</h2>
+
+              <p className="text-xs sm:text-sm text-gray-600">
+                Order ID:
+                <span className="ml-1 font-mono">{orderId}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+    </div >
   );
 }

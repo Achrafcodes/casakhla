@@ -39,7 +39,7 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative bg-white">
       {/* Hero Section */}
       <section className="relative h-[40vh] min-h-[300px] flex items-center justify-center bg-black text-white">
         <div className="relative z-10 text-center px-6">
