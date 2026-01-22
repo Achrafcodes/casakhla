@@ -19,8 +19,6 @@ export function ShoppingBag() {
       dispatch(updateQuantity({ id, size, quantity: newQuantity }));
     }
   };
-  const user = useAppSelector((state) => state.auth.user); // adjust based on your store
-  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
