@@ -26,15 +26,15 @@ export function Hero({ image = heroImage }: HeroProps) {
           </div>
           <h1 className="text-white mb-6 sm:mb-8 leading-[0.95]">
             <span className="block text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-light tracking-tighter">
-              REDEFINE
+              Identify
             </span>
             <span className="block text-5xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tighter mt-2">
-              YOUR STYLE
+              Yourself
             </span>
           </h1>
           <p className="text-white/90 text-base sm:text-lg md:text-xl mb-8 sm:mb-12 max-w-xl font-light leading-relaxed">
-            Discover the intersection of contemporary design and timeless elegance.
-            Curated pieces for the modern individual.
+            to find all your Casablanca's experiences in one spot, you must first gather the courage to know who you are
+
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <button className="bg-white text-black px-6 sm:px-8 py-3 sm:py-4 text-sm tracking-wider uppercase hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group">

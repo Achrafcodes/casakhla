@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { logout } from '../store/authSlice';
 import { openCart } from '../store/cartSlice';
-import logo from 'figma:asset/7c6c2fad212f774214e6ed970c475f3b61a0dd75.png';
+import brand from '../../assets/logo.png'
 
 interface HeaderProps {
   onNavigate?: (page: 'home' | 'collections' | 'login' | 'signup' | 'admin' | 'about' | 'contact') => void;
@@ -34,29 +34,30 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-black/10">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
           {/* Logo */}
-          <button 
-            onClick={() => handleNavigate('home')} 
+          <button
+            onClick={() => handleNavigate('home')}
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <img src={logo} alt="CASAKA7LA" className="h-10 sm:h-12 w-auto" />
+            <img src={brand} alt="CASAKA7LA" className="h-16 w-32 object-contain" />
+
           </button>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm tracking-wider uppercase">
-            <button 
-              onClick={() => handleNavigate('collections')} 
+            <button
+              onClick={() => handleNavigate('collections')}
               className={`hover:opacity-60 transition-opacity ${currentPage === 'collections' ? 'border-b-2 border-black' : ''}`}
             >
               Collections
             </button>
-            <button 
-              onClick={() => handleNavigate('about')} 
+            <button
+              onClick={() => handleNavigate('about')}
               className={`hover:opacity-60 transition-opacity ${currentPage === 'about' ? 'border-b-2 border-black' : ''}`}
             >
               About
             </button>
-            <button 
-              onClick={() => handleNavigate('contact')} 
+            <button
+              onClick={() => handleNavigate('contact')}
               className={`hover:opacity-60 transition-opacity ${currentPage === 'contact' ? 'border-b-2 border-black' : ''}`}
             >
               Contact
@@ -68,11 +69,11 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
             <button className="hover:opacity-60 transition-opacity" aria-label="Search">
               <Search className="w-5 h-5" />
             </button>
-            
+
             {/* Shopping Bag */}
-            <button 
+            <button
               onClick={() => dispatch(openCart())}
-              className="hover:opacity-60 transition-opacity relative" 
+              className="hover:opacity-60 transition-opacity relative"
               aria-label="Shopping Bag"
             >
               <ShoppingBag className="w-5 h-5" />
@@ -82,14 +83,14 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                 </span>
               )}
             </button>
-            
+
             {isAuthenticated ? (
               <>
                 <div className="hidden lg:flex items-center gap-2 text-sm">
                   <span className="text-gray-600">Hi, {user?.firstName || user?.email}</span>
                 </div>
                 {isAdmin && (
-                  <button 
+                  <button
                     onClick={() => handleNavigate('admin')}
                     className={`hover:opacity-60 transition-opacity ${currentPage === 'admin' ? 'text-black' : 'text-gray-400'}`}
                     aria-label="Admin"
@@ -98,9 +99,9 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                     <Shield className="w-5 h-5" />
                   </button>
                 )}
-                <button 
+                <button
                   onClick={handleLogout}
-                  className="hover:opacity-60 transition-opacity" 
+                  className="hover:opacity-60 transition-opacity"
                   aria-label="Logout"
                   title="Logout"
                 >
@@ -108,9 +109,9 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                 </button>
               </>
             ) : (
-              <button 
+              <button
                 onClick={() => handleNavigate('login')}
-                className="hover:opacity-60 transition-opacity" 
+                className="hover:opacity-60 transition-opacity"
                 aria-label="Account"
               >
                 <User className="w-5 h-5" />
@@ -134,27 +135,27 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
         <div className="fixed inset-0 z-40 bg-white pt-20 md:hidden">
           <div className="h-full overflow-y-auto">
             <nav className="flex flex-col p-6 space-y-6">
-              <button 
+              <button
                 onClick={() => handleNavigate('collections')}
                 className="text-left text-2xl tracking-tighter hover:opacity-60 transition-opacity"
               >
                 Collections
               </button>
-              <button 
+              <button
                 onClick={() => handleNavigate('about')}
                 className="text-left text-2xl tracking-tighter hover:opacity-60 transition-opacity"
               >
                 About
               </button>
-              <button 
+              <button
                 onClick={() => handleNavigate('contact')}
                 className="text-left text-2xl tracking-tighter hover:opacity-60 transition-opacity"
               >
                 Contact
               </button>
-              
+
               <div className="border-t border-black/10 pt-6 space-y-4">
-                <button 
+                <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     dispatch(openCart());
@@ -172,7 +173,7 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                       <span>{user?.firstName || user?.email}</span>
                     </div>
                     {isAdmin && (
-                      <button 
+                      <button
                         onClick={() => handleNavigate('admin')}
                         className="flex items-center gap-3 hover:opacity-60 transition-opacity"
                       >
@@ -180,7 +181,7 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                         <span>Admin Dashboard</span>
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 hover:opacity-60 transition-opacity"
                     >
@@ -189,7 +190,7 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                     </button>
                   </>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => handleNavigate('login')}
                     className="flex items-center gap-3 hover:opacity-60 transition-opacity"
                   >

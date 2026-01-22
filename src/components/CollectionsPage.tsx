@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addToCart, openCart } from '../store/cartSlice';
 import { ShoppingBag, X } from 'lucide-react';
-import { Slider } from './ui/Slider';
+import { ProductCarousel } from './ui/ProductCarousel';
+import SimpleSlider from './ui/slid';
 
 interface CollectionsPageProps {
   initialCategory?: string;
@@ -132,8 +133,8 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setSelectedProduct(null)}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
-            <div className="bg-white max-w-5xl w-full max-h-[90vh] overflow-y-auto relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto relative rounded-lg shadow-2xl">
               <button
                 onClick={() => setSelectedProduct(null)}
                 className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 hover:bg-gray-100 transition-colors"
@@ -146,22 +147,10 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
                 if (!product) return null;
 
                 return (
-                  <div className="grid md:grid-cols-2 gap-8 p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
                     {/* Product Carousel */}
-                    <div className="carousel-container max-w-[220px] mx-auto">
-                      <Slider {...carouselSettings}>
-                        {product?.images?.map((image, index) => (
-                          <div key={index}>
-                            <div className="w-[220px] h-[280px] bg-gray-100 overflow-hidden rounded-lg">
-                              <img
-                                src={image}
-                                alt={`${product.title} ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </Slider>
+                    <div className="w-full  mt-4 max-w-md mx-auto">
+                      <SimpleSlider images={product.images} />
                     </div>
 
                     {/* Product Details */}
@@ -182,7 +171,6 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
                       <div className="mb-8">
                         <h3 className="text-sm uppercase tracking-wider mb-3">Select Size</h3>
                         <div className="grid grid-cols-5 gap-2">
-
                           {['XS', 'S', 'M', 'L', 'XL'].map((size) => (
                             <button
                               key={size}
