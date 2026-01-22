@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { logout } from '../store/authSlice';
 import { openCart } from '../store/cartSlice';
-import brand from '../../assets/logo.png'
+import brand from '/logo.png'
 
 interface HeaderProps {
   onNavigate?: (page: 'home' | 'collections' | 'login' | 'signup' | 'admin' | 'about' | 'contact') => void;

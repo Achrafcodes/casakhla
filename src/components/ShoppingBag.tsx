@@ -1,9 +1,6 @@
 import { X, Plus, Minus, ShoppingBag as BagIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { closeCart, removeFromCart, updateQuantity } from '../store/cartSlice';
-import { createOrder } from '../firebase/firestoreOrders';
-import { useNavigate } from 'react-router-dom'; // if using React Router for login redirect
-
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
   const { items, isOpen } = useAppSelector((state) => state.cart);
@@ -22,6 +19,8 @@ export function ShoppingBag() {
       dispatch(updateQuantity({ id, size, quantity: newQuantity }));
     }
   };
+  const user = useAppSelector((state) => state.auth.user); // adjust based on your store
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
