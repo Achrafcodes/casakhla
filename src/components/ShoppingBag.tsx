@@ -11,7 +11,7 @@ export function ShoppingBag() {
       return total + price * item.quantity;
     }, 0);
   };
-  // hello
+  // hel
   const handleQuantityChange = (id: string, size: string | undefined, newQuantity: number) => {
     if (newQuantity < 1) {
       dispatch(removeFromCart({ id, size }));
