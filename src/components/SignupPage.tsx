@@ -29,18 +29,80 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
     setValidationError('');
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
+  };
+
+  const validateForm = (): boolean => {
+    // Validate first name
+    if (!formData.firstName.trim()) {
+      setValidationError('Please enter your first name!');
+      return false;
+    }
+
+    // Validate last name
+    if (!formData.lastName.trim()) {
+      setValidationError('Please enter your last name!');
+      return false;
+    }
+
+    // Validate email
+    if (!formData.email.trim()) {
+      setValidationError('Please enter your email address!');
+      return false;
+    }
+
+    if (!validateEmail(formData.email)) {
+      setValidationError('Please enter a valid email address!');
+      return false;
+    }
+
+    // Validate phone number
+    if (!formData.phoneNumber.trim()) {
+      setValidationError('Please enter your phone number!');
+      return false;
+    }
+
+    if (!validatePhone(formData.phoneNumber)) {
+      setValidationError('Please enter a valid phone number!');
+      return false;
+    }
+
+    // Validate password
+    if (!formData.password) {
+      setValidationError('Please enter a password!');
+      return false;
+    }
+
+    if (formData.password.length < 6) {
+      setValidationError('Password must be at least 6 characters long!');
+      return false;
+    }
+
+    // Validate password match
+    if (!formData.confirmPassword) {
+      setValidationError('Please confirm your password!');
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setValidationError('Passwords do not match!');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate password match
-    if (formData.password !== formData.confirmPassword) {
-      setValidationError('Passwords do not match!');
-      return;
-    }
-
-    // Validate password length
-    if (formData.password.length < 6) {
-      setValidationError('Password must be at least 6 characters long');
+    if (!validateForm()) {
       return;
     }
 
@@ -55,9 +117,18 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
 
       // Navigate to home after successful signup
       onNavigate?.('home');
-    } catch (err) {
-      // Error will be handled by Redux state
-      console.error('Signup failed:', err);
+    } catch (err: any) {
+      // Handle Firebase errors as user-friendly messages
+      const errorMessage = err?.message || 'An error occurred during signup';
+      if (errorMessage.includes('email-already-in-use')) {
+        setValidationError('This email is already registered!');
+      } else if (errorMessage.includes('weak-password')) {
+        setValidationError('Password is too weak!');
+      } else if (errorMessage.includes('invalid-email')) {
+        setValidationError('Please enter a valid email address!');
+      } else {
+        setValidationError('Signup failed. Please try again!');
+      }
     }
   };
 
@@ -75,7 +146,7 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
       {/* Left Side - Image */}
       <button
         onClick={() => onNavigate?.('home')}
-        className="fixed ml-24  w-24 flex items-center justify-center top-16 left-4 flex items-center text-gray-600 hover:text-black transition-colors z-10 text-lg shadow-md rounded-lg p-2"
+        className="fixed ml-24 w-24 flex items-center justify-center top-16 left-4 text-gray-600 hover:text-black transition-colors z-10 text-lg shadow-md rounded-lg p-2"
       >
         <ArrowLeft className="w-12 h-12 text-white" />
       </button>
@@ -109,9 +180,9 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
           </div>
 
           {/* Error Messages */}
-          {(error || validationError) && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm">
-              {error || validationError}
+          {(validationError || error) && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm rounded">
+              {validationError || error}
             </div>
           )}
 
@@ -249,7 +320,15 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
             </div>
           </div>
 
-
+          {/* Google Sign In */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full border border-black/20 py-4 text-sm uppercase tracking-wider hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Sign up with Google
+          </button>
 
           {/* Login Link */}
           <div className="mt-8 text-center text-sm">

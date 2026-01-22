@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { store } from './store/store';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -24,37 +25,30 @@ import whiteHoodie from 'figma:asset/877531fbc80ee4389c993063c1dd6ca4982ac9d4.pn
 import blackHoodie from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
 import blackHoodieClose from 'figma:asset/260c21762636574db191d400b7bf3ac3faee81ce.png';
 
+
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'collections' | 'login' | 'signup' | 'admin' | 'about' | 'contact'>('home');
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.items);
   const authLoading = useAppSelector((state) => state.auth.loading);
-  
-  // Initialize Firebase auth state and products on mount
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Check authentication state
     dispatch(checkAuthState());
-    
-    // Fetch products from Firebase
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const handleNavigate = (page: any, category?: string) => {
-    setCurrentPage(page);
+  const handleNavigate = (page: string, category?: string) => {
     if (page === 'collections' && category) {
-      setSelectedCategory(category);
+      navigate(`/collections?category=${category}`);
     } else {
-      setSelectedCategory(undefined);
+      navigate(`/${page !== 'home' ? page : ''}`);
     }
-    // Scroll to top
     window.scrollTo(0, 0);
   };
 
-  // Display featured products or fallback to default images
   const featuredProducts = products.length > 0 ? products.slice(0, 4).map(p => ({
     ...p,
-    image: p.images[0] // Use first image for featured display
+    image: p.images[0]
   })) : [
     {
       id: '1',
@@ -90,7 +84,6 @@ function AppContent() {
     },
   ];
 
-  // Show loading state while checking auth
   if (authLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -102,92 +95,94 @@ function AppContent() {
     );
   }
 
-  // Admin page
-  if (currentPage === 'admin') {
-    return (
-      <>
-        <Header onNavigate={handleNavigate} currentPage={currentPage} />
-        <ShoppingBag />
-        <main className="pt-16">
-          <AdminPage />
-        </main>
-      </>
-    );
-  }
-
-  // Login and Signup pages (no header/footer)
-  if (currentPage === 'login') {
-    return <LoginPage onNavigate={handleNavigate} />;
-  }
-
-  if (currentPage === 'signup') {
-    return <SignupPage onNavigate={handleNavigate} />;
-  }
-
-  // Collections page
-  if (currentPage === 'collections') {
-    return (
-      <>
-        <Header onNavigate={handleNavigate} currentPage={currentPage} />
-        <ShoppingBag />
-        <main className="pt-16">
-          <CollectionsPage initialCategory={selectedCategory} />
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  // About page
-  if (currentPage === 'about') {
-    return (
-      <>
-        <Header onNavigate={handleNavigate} currentPage={currentPage} />
-        <ShoppingBag />
-        <main className="pt-16">
-          <About />
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  // Contact page
-  if (currentPage === 'contact') {
-    return (
-      <>
-        <Header onNavigate={handleNavigate} currentPage={currentPage} />
-        <ShoppingBag />
-        <main className="pt-16">
-          <Contact />
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  // Home page
   return (
-    <div className="min-h-screen bg-white">
-      <Header onNavigate={handleNavigate} currentPage={currentPage} />
-      <ShoppingBag />
-      <main className="pt-16">
-        <Hero />
-        <FeaturedProducts products={featuredProducts} />
-        <Collections onNavigate={handleNavigate} />
-        <BrandStory />
-        <Testimonials />
-        <Newsletter />
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage onNavigate={handleNavigate} />} />
+      <Route path="/signup" element={<SignupPage onNavigate={handleNavigate} />} />
+
+      <Route
+        path="/admin"
+        element={
+          <>
+            <Header onNavigate={handleNavigate} currentPage="admin" />
+            <ShoppingBag />
+            <main className="pt-16">
+              <AdminPage />
+            </main>
+          </>
+        }
+      />
+
+      <Route
+        path="/collections"
+        element={
+          <>
+            <Header onNavigate={handleNavigate} currentPage="collections" />
+            <ShoppingBag />
+            <main className="pt-16">
+              <CollectionsPage />
+            </main>
+            <Footer />
+          </>
+        }
+      />
+
+      <Route
+        path="/about"
+        element={
+          <>
+            <Header onNavigate={handleNavigate} currentPage="about" />
+            <ShoppingBag />
+            <main className="pt-16">
+              <About />
+            </main>
+            <Footer />
+          </>
+        }
+      />
+
+      <Route
+        path="/contact"
+        element={
+          <>
+            <Header onNavigate={handleNavigate} currentPage="contact" />
+            <ShoppingBag />
+            <main className="pt-16">
+              <Contact />
+            </main>
+            <Footer />
+          </>
+        }
+      />
+
+      <Route
+        path="/"
+        element={
+          <div className="min-h-screen bg-white">
+            <Header onNavigate={handleNavigate} currentPage="home" />
+            <ShoppingBag />
+            <main className="pt-16">
+              <Hero />
+              <FeaturedProducts products={featuredProducts} />
+              <Collections onNavigate={handleNavigate} />
+              <BrandStory />
+              <Testimonials />
+              <Newsletter />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+    </Routes>
   );
 }
 
 export default function App() {
   return (
     <Provider store={store}>
-      <AppContent />
+      <Router>
+        <AppContent />
+      </Router>
     </Provider>
   );
 }
