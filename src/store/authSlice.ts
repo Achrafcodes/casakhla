@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { 
-  signUpWithEmail, 
-  signInWithEmail, 
-  signInWithGoogle, 
+import {
+  signUpWithEmail,
+  signInWithEmail,
+  signInWithGoogle,
   signOutUser,
-  getCurrentUserData 
+  getCurrentUserData
 } from '../lib/authService';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -44,6 +44,7 @@ export const loginWithEmail = createAsyncThunk(
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber,
         isAdmin: userData.isAdmin,
       };
     } catch (error: any) {
@@ -55,8 +56,8 @@ export const loginWithEmail = createAsyncThunk(
 export const signupWithEmail = createAsyncThunk(
   'auth/signupWithEmail',
   async (
-    { email, password, firstName, lastName, phoneNumber }: 
-    { email: string; password: string; firstName: string; lastName: string; phoneNumber?: string },
+    { email, password, firstName, lastName, phoneNumber }:
+      { email: string; password: string; firstName: string; lastName: string; phoneNumber?: string },
     { rejectWithValue }
   ) => {
     try {
@@ -105,7 +106,9 @@ export const logout = createAsyncThunk(
   }
 );
 
-export const checkAuthState = createAsyncThunk(
+export const checkAuthState = createAsyncThunk<
+  { id: string; email: string; firstName?: string; lastName?: string; phoneNumber?: string; isAdmin: boolean } | null
+>(
   'auth/checkAuthState',
   async (_, { rejectWithValue }) => {
     try {

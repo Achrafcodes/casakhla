@@ -1,6 +1,7 @@
 import { X, Plus, Minus, ShoppingBag as BagIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { closeCart, removeFromCart, updateQuantity } from '../store/cartSlice';
+
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
   const { items, isOpen } = useAppSelector((state) => state.cart);
@@ -11,7 +12,7 @@ export function ShoppingBag() {
       return total + price * item.quantity;
     }, 0);
   };
-  // hel
+
   const handleQuantityChange = (id: string, size: string | undefined, newQuantity: number) => {
     if (newQuantity < 1) {
       dispatch(removeFromCart({ id, size }));
