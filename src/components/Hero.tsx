@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import heroImage from '/casa.png';
+import heroImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
 
 interface HeroProps {
   image?: string;

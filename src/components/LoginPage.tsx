@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginWithEmail, loginWithGoogle } from '../store/authSlice';
-import brandImage from '/casa.png';
+import brandImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
 
 interface LoginPageProps {
   onNavigate?: (page: 'home' | 'collections' | 'login' | 'signup' | 'admin') => void;
