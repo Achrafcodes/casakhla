@@ -1,5 +1,6 @@
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { useState } from 'react';
+import { Mail, Phone, MapPin, Send, CheckCircle, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { createContactMessage } from '../lib/messagesService';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,19 @@ export function Contact() {
     subject: '',
     message: '',
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Auto close success modal after 3 seconds
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -17,18 +31,38 @@ export function Contact() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Contact form submitted:', formData);
-    alert('Thank you for contacting us! We will get back to you soon.');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: '',
-    });
+    try {
+      // Validate form
+      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        setErrorMessage('Please fill in all required fields.');
+        setShowErrorModal(true);
+        return;
+      }
+
+      // Send message to database
+      await createContactMessage({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+      });
+
+      setShowSuccessModal(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+      });
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      setErrorMessage(error?.message || 'Failed to send message. Please try again.');
+      setShowErrorModal(true);
+    }
   };
 
   return (
@@ -52,7 +86,7 @@ export function Contact() {
               <h3 className="text-2xl tracking-tighter mb-8">
                 Contact Information
               </h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-black flex items-center justify-center flex-shrink-0">
@@ -218,6 +252,53 @@ export function Contact() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-auto max-w-sm animate-scaleIn">
+            <div className="p-6 sm:p-8 text-center space-y-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-full mx-auto flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
+              </div>
+
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold">Message Sent Successfully!</h2>
+
+              <p className="text-xs sm:text-sm text-gray-600">
+                Thank you for contacting us. We will get back to you as soon as possible.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-auto max-w-sm">
+            <div className="flex items-center justify-between p-6 sm:p-8 border-b border-black/10">
+              <h2 className="text-base sm:text-lg font-semibold">Error</h2>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 sm:p-8 text-center space-y-4">
+              <p className="text-xs sm:text-sm text-gray-600">
+                {errorMessage}
+              </p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="w-full bg-black text-white py-3 text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import heroImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
+import heroImage from '/casa.png';
 
 interface HeroProps {
   image?: string;
@@ -44,9 +44,9 @@ export function Hero({ image = heroImage }: HeroProps) {
               Explore Collection
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="border border-white text-white px-6 sm:px-8 py-3 sm:py-4 text-sm tracking-wider uppercase hover:bg-white hover:text-black transition-all duration-300">
+            {/* <button className="border border-white text-white px-6 sm:px-8 py-3 sm:py-4 text-sm tracking-wider uppercase hover:bg-white hover:text-black transition-all duration-300">
               View Lookbook
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

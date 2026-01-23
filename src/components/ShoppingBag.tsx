@@ -4,8 +4,10 @@ import {
   Minus,
   ShoppingBag as ShoppingBagIcon,
   CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   closeCart,
@@ -25,10 +27,12 @@ import { db } from '../lib/firebase';
 
 export function ShoppingBag() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { items, isOpen } = useAppSelector((state) => state.cart);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [orderId, setOrderId] = useState('');
 
   /* -------------------- HELPERS -------------------- */
@@ -53,7 +57,14 @@ export function ShoppingBag() {
   /* -------------------- CHECKOUT -------------------- */
   const handleCheckout = async () => {
     const user = auth.currentUser;
-    if (!user || items.length === 0) return;
+
+    // Check if user is logged in
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (items.length === 0) return;
 
     setIsProcessing(true);
 
@@ -229,6 +240,46 @@ export function ShoppingBag() {
           </div>
         )}
       </div>
+
+      {/* Login Required Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-auto max-w-sm">
+            <div className="p-6 sm:p-8 text-center space-y-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-full mx-auto flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
+              </div>
+
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold">Login Required</h2>
+
+              <p className="text-xs sm:text-sm text-gray-600">
+                Please log in to your account to place an order. It only takes a moment!
+              </p>
+
+              <div className="flex flex-col gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    navigate('/login');
+                    setShowLoginModal(false);
+                    dispatch(closeCart());
+                  }}
+                  className="w-full bg-black text-white py-3 text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors rounded"
+                >
+                  Go to Login
+                </button>
+                <button
+                  onClick={() => setShowLoginModal(false)}
+                  className="w-full border border-black/20 py-3 text-sm uppercase tracking-wider hover:border-black transition-colors rounded"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 h-full z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-2xl shadow-2xl w-auto max-w-sm animate-scaleIn">

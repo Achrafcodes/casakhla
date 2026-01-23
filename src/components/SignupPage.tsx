@@ -1,12 +1,37 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { signupWithEmail, loginWithGoogle } from '../store/authSlice';
-import brandImage from 'figma:asset/877531fbc80ee4389c993063c1dd6ca4982ac9d4.png';
+import brandImage from '/casa.png';
 
 interface SignupPageProps {
   onNavigate?: (page: 'home' | 'collections' | 'login' | 'signup' | 'admin') => void;
 }
+
+const getErrorMessage = (error: string): string => {
+  if (!error) return '';
+
+  // Firebase error messages mapping
+  if (error.includes('auth/email-already-in-use')) {
+    return 'This email is already registered. Please use a different email or log in instead.';
+  }
+  if (error.includes('auth/weak-password')) {
+    return 'Password is too weak. Please use at least 6 characters.';
+  }
+  if (error.includes('auth/invalid-email')) {
+    return 'Invalid email address. Please enter a valid email.';
+  }
+  if (error.includes('auth/operation-not-allowed')) {
+    return 'Email and password accounts are not enabled. Please contact support.';
+  }
+  if (error.includes('auth/too-many-requests')) {
+    return 'Too many signup attempts. Please try again later.';
+  }
+
+  // Generic fallback - strip Firebase prefix if present
+  const message = error.replace('Firebase: Error (', '').replace(')', '');
+  return message || 'An error occurred during signup. Please try again.';
+};
 
 export function SignupPage({ onNavigate }: SignupPageProps) {
   const dispatch = useAppDispatch();
@@ -118,17 +143,8 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
       // Navigate to home after successful signup
       onNavigate?.('home');
     } catch (err: any) {
-      // Handle Firebase errors as user-friendly messages
-      const errorMessage = err?.message || 'An error occurred during signup';
-      if (errorMessage.includes('email-already-in-use')) {
-        setValidationError('This email is already registered!');
-      } else if (errorMessage.includes('weak-password')) {
-        setValidationError('Password is too weak!');
-      } else if (errorMessage.includes('invalid-email')) {
-        setValidationError('Please enter a valid email address!');
-      } else {
-        setValidationError('Signup failed. Please try again!');
-      }
+      // Error will be handled by Redux state and displayed via getErrorMessage()
+      console.error('Signup failed:', err);
     }
   };
 
@@ -181,8 +197,12 @@ export function SignupPage({ onNavigate }: SignupPageProps) {
 
           {/* Error Messages */}
           {(validationError || error) && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm rounded">
-              {validationError || error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-red-800">
+                <p className="font-semibold mb-1">{validationError ? 'Validation Error' : 'Signup Failed'}</p>
+                <p>{validationError || getErrorMessage(error || '')}</p>
+              </div>
             </div>
           )}
 

@@ -22,9 +22,18 @@ export const getAllOrders = async (): Promise<Order[]> => {
 
     const orders: Order[] = [];
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       orders.push({
         id: doc.id,
-        ...doc.data()
+        userId: data.userId,
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
+        items: data.items,
+        totalAmount: data.totalAmount,
+        status: data.status,
+        createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt),
+        updatedAt: data.updatedAt?.toDate?.() || new Date(data.updatedAt)
       } as Order);
     });
 

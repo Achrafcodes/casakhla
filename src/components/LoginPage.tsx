@@ -1,12 +1,46 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginWithEmail, loginWithGoogle } from '../store/authSlice';
-import brandImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
+import brandImage from '/casa.png';
 
 interface LoginPageProps {
   onNavigate?: (page: 'home' | 'collections' | 'login' | 'signup' | 'admin') => void;
 }
+
+const getErrorMessage = (error: string): string => {
+  if (!error) return '';
+
+  // Firebase error messages mapping
+  if (error.includes('auth/invalid-credential')) {
+    return 'Incorrect email or password. Please check and try again.';
+  }
+  if (error.includes('auth/invalid-email')) {
+    return 'Invalid email address. Please enter a valid email.';
+  }
+  if (error.includes('auth/user-not-found')) {
+    return 'No account found with this email. Please sign up first.';
+  }
+  if (error.includes('auth/wrong-password')) {
+    return 'Incorrect password. Please try again.';
+  }
+  if (error.includes('auth/too-many-requests')) {
+    return 'Too many failed login attempts. Please try again later.';
+  }
+  if (error.includes('auth/user-disabled')) {
+    return 'This account has been disabled. Please contact support.';
+  }
+  if (error.includes('Missing or insufficient permissions')) {
+    return 'Permission denied. Please check your credentials.';
+  }
+  if (error.includes('auth/network-request-failed')) {
+    return 'Network error. Please check your internet connection and try again.';
+  }
+
+  // Generic fallback - strip Firebase prefix if present
+  const message = error.replace('Firebase: Error (', '').replace(')', '');
+  return message || 'An error occurred during login. Please try again.';
+};
 
 export function LoginPage({ onNavigate }: LoginPageProps) {
   const dispatch = useAppDispatch();
@@ -50,18 +84,16 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           {/* Header */}
           <div className="mb-12">
             <h1 className="text-5xl lg:text-6xl tracking-tighter mb-4">Welcome Back</h1>
-            <p className="text-gray-600 tracking-wide">
-              Sign in to access your account
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Tip: Use an email with "admin" to get admin access
-            </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-red-800">
+                <p className="font-semibold mb-1">Login Failed</p>
+                <p>{getErrorMessage(error)}</p>
+              </div>
             </div>
           )}
 

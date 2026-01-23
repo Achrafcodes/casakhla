@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X, Package, ShoppingCart } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Package, ShoppingCart, Mail } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addProduct, updateProduct, deleteProduct } from '../store/productsSlice';
 import { fetchOrders, updateOrderStatus } from '../store/ordersSlice';
+import { getAllMessages, deleteContactMessage } from '../lib/messagesService';
 import type { Product } from '../store/productsSlice';
+import type { ContactMessage } from '../lib/messagesService';
 
 export function AdminPage() {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.items);
   const orders = useAppSelector((state) => state.orders.items);
   const { isAdmin, user } = useAppSelector((state) => state.auth);
-  
-  const [activeTab, setActiveTab] = useState<'products' | 'orders'>('products');
+
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'messages'>('products');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -26,6 +30,50 @@ export function AdminPage() {
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
+
+  // Fetch messages when tab is active
+  useEffect(() => {
+    if (activeTab === 'messages') {
+      fetchMessages();
+    }
+  }, [activeTab]);
+
+  const fetchMessages = async () => {
+    setLoadingMessages(true);
+    try {
+      const data = await getAllMessages();
+      setMessages(data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      alert('Failed to load messages');
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (confirm('Are you sure you want to delete this message?')) {
+      try {
+        await deleteContactMessage(id);
+        setMessages(messages.filter(m => m.id !== id));
+      } catch (error) {
+        console.error('Error deleting message:', error);
+        alert('Failed to delete message');
+      }
+    }
+  };
+
+  // Helper function to convert Firebase Timestamp to Date
+  const convertTimestamp = (timestamp: any) => {
+    if (!timestamp) return new Date();
+    if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate();
+    }
+    if (timestamp instanceof Date) {
+      return timestamp;
+    }
+    return new Date(timestamp);
+  };
 
   const handleOpenModal = (product?: Product) => {
     if (product) {
@@ -57,21 +105,21 @@ export function AdminPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Filter out empty image URLs
     const validImages = formData.images.filter(img => img.trim() !== '');
-    
+
     if (validImages.length === 0) {
       alert('Please add at least one image URL');
       return;
     }
-    
+
     if (editingProduct) {
       dispatch(updateProduct({ ...formData, images: validImages, id: editingProduct.id }));
     } else {
       dispatch(addProduct({ ...formData, images: validImages }));
     }
-    
+
     handleCloseModal();
   };
 
@@ -106,7 +154,7 @@ export function AdminPage() {
       });
     }
   };
-  
+
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
       dispatch(deleteProduct(id));
@@ -150,25 +198,33 @@ export function AdminPage() {
           <div className="flex gap-8">
             <button
               onClick={() => setActiveTab('products')}
-              className={`py-4 text-sm uppercase tracking-wider border-b-2 transition-colors ${
-                activeTab === 'products'
-                  ? 'border-black'
-                  : 'border-transparent hover:border-gray-300'
-              }`}
+              className={`py-4 text-sm uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'products'
+                ? 'border-black'
+                : 'border-transparent hover:border-gray-300'
+                }`}
             >
               <Package className="w-4 h-4 inline mr-2" />
               Products
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`py-4 text-sm uppercase tracking-wider border-b-2 transition-colors ${
-                activeTab === 'orders'
-                  ? 'border-black'
-                  : 'border-transparent hover:border-gray-300'
-              }`}
+              className={`py-4 text-sm uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'orders'
+                ? 'border-black'
+                : 'border-transparent hover:border-gray-300'
+                }`}
             >
               <ShoppingCart className="w-4 h-4 inline mr-2" />
               Orders ({orders.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('messages')}
+              className={`py-4 text-sm uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'messages'
+                ? 'border-black'
+                : 'border-transparent hover:border-gray-300'
+                }`}
+            >
+              <Mail className="w-4 h-4 inline mr-2" />
+              Messages ({messages.length})
             </button>
           </div>
         </div>
@@ -264,7 +320,7 @@ export function AdminPage() {
                     ))}
                   </tbody>
                 </table>
-                
+
                 {products.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
                     <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -274,11 +330,11 @@ export function AdminPage() {
               </div>
             </div>
           </>
-        ) : (
+        ) : activeTab === 'orders' ? (
           <>
             {/* Orders */}
             <h2 className="text-2xl tracking-tighter mb-8">Orders</h2>
-            
+
             <div className="space-y-6">
               {orders.map((order) => (
                 <div key={order.id} className="bg-white border border-black/10 p-6">
@@ -329,7 +385,7 @@ export function AdminPage() {
                   </div>
                 </div>
               ))}
-              
+
               {orders.length === 0 && (
                 <div className="bg-white border border-black/10 p-16 text-center text-gray-500">
                   <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -337,6 +393,69 @@ export function AdminPage() {
                 </div>
               )}
             </div>
+          </>
+        ) : (
+          <>
+            {/* Messages */}
+            <h2 className="text-2xl tracking-tighter mb-8">Contact Messages</h2>
+
+            {loadingMessages ? (
+              <div className="text-center py-16 text-gray-500">
+                <p>Loading messages...</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {messages.map((message) => (
+                  <div key={message.id} className="bg-white border border-black/10 p-6">
+                    <div className="grid md:grid-cols-3 gap-6 mb-4">
+                      <div>
+                        <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">From</h3>
+                        <p className="mb-1"><strong>{message.name}</strong></p>
+                        <p className="text-sm text-gray-600">{message.email}</p>
+                        {message.phone && (
+                          <p className="text-sm text-gray-600">{message.phone}</p>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">Subject</h3>
+                        <p className="mb-1">{message.subject}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">Date</h3>
+                        <p className="text-sm">
+                          {convertTimestamp(message.createdAt).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {convertTimestamp(message.createdAt).toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mb-4 pb-4 border-b border-black/10">
+                      <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">Message</h3>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{message.message}</p>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleDeleteMessage(message.id)}
+                        className="p-2 hover:bg-red-50 text-red-600 rounded transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {messages.length === 0 && (
+                  <div className="bg-white border border-black/10 p-16 text-center text-gray-500">
+                    <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>No messages yet</p>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
