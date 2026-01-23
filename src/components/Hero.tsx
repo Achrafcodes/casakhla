@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import heroImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
 
 interface HeroProps {
@@ -6,6 +7,7 @@ interface HeroProps {
 }
 
 export function Hero({ image = heroImage }: HeroProps) {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -39,7 +41,10 @@ export function Hero({ image = heroImage }: HeroProps) {
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               className="bg-white text-black px-6 sm:px-8 py-3 sm:py-4 text-sm tracking-wider uppercase hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group"
-              onClick={() => window.location.href = '/collections'}
+              onClick={() => {
+                navigate('/collections');
+                window.scrollTo(0, 0);
+              }}
             >
               Explore Collection
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
