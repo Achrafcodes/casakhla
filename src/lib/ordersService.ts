@@ -29,6 +29,7 @@ export const getAllOrders = async (): Promise<Order[]> => {
         customerName: data.customerName,
         customerEmail: data.customerEmail,
         customerPhone: data.customerPhone,
+        customerAddress: data.customerAddress,
         items: data.items,
         totalAmount: data.totalAmount,
         status: data.status,

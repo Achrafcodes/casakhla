@@ -144,8 +144,8 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                       {/* Size Selection */}
                       <div className="mb-8">
                         <h3 className="text-sm uppercase tracking-wider mb-3">Select Size</h3>
-                        <div className="grid grid-cols-5 gap-2">
-                          {['XS', 'S', 'M', 'L', 'XL'].map((size) => (
+                        <div className="flex flex-row gap-2">
+                          {['M', 'L', 'XL', '2XL'].map((size) => (
                             <button
                               key={size}
                               onClick={() => setSelectedSize(size)}

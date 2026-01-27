@@ -19,9 +19,12 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Orders collection - readable by admin only
+    // Orders collection - guests and authenticated users can create, admins can read/update
     match /orders/{document=**} {
-      allow read, write: if request.auth != null && 
+      allow create: if true;  // Anyone can create orders (guests or authenticated)
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow update: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 

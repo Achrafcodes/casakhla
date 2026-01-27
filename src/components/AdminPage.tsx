@@ -343,7 +343,10 @@ export function AdminPage() {
                       <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">Customer Info</h3>
                       <p className="mb-1"><strong>{order.customerName}</strong></p>
                       <p className="text-sm text-gray-600">{order.customerEmail}</p>
-                      <p className="text-sm text-gray-600">{order.customerPhone}</p>
+                      <p className="text-sm text-gray-600 mb-1">{order.customerPhone}</p>
+                      {order.customerAddress && (
+                        <p className="text-sm text-gray-600"><strong>Address:</strong> {order.customerAddress}</p>
+                      )}
                     </div>
                     <div>
                       <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">Order Details</h3>

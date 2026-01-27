@@ -1,0 +1,30 @@
+# CASAKA7LA Robots.txt
+
+# Allow all robots
+User-agent: *
+Allow: /
+
+# Disallow private pages
+Disallow: /admin
+Disallow: /login
+Disallow: /signup
+
+# Crawl delay (optional - in seconds)
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://casaka7la.com/sitemap.xml
+
+# Search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

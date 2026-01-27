@@ -108,15 +108,7 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                   <LogOut className="w-5 h-5" />
                 </button>
               </>
-            ) : (
-              <button
-                onClick={() => handleNavigate('login')}
-                className="hover:opacity-60 transition-opacity"
-                aria-label="Account"
-              >
-                <User className="w-5 h-5" />
-              </button>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
@@ -189,15 +181,7 @@ export function Header({ onNavigate, currentPage = 'home' }: HeaderProps) {
                       <span>Logout</span>
                     </button>
                   </>
-                ) : (
-                  <button
-                    onClick={() => handleNavigate('login')}
-                    className="flex items-center gap-3 hover:opacity-60 transition-opacity"
-                  >
-                    <User className="w-5 h-5" />
-                    <span>Sign In</span>
-                  </button>
-                )}
+                ) : null}
               </div>
             </nav>
           </div>
