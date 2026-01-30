@@ -226,7 +226,7 @@ export function ShoppingBag() {
           <div className="border-t p-6 space-y-4">
             <div className="flex justify-between text-lg">
               <span>Subtotal</span>
-              <span>${calculateTotal().toFixed(2)}</span>
+              <span>{calculateTotal().toFixed(2)}</span>
             </div>
 
             <button
