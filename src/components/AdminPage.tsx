@@ -114,10 +114,16 @@ export function AdminPage() {
       return;
     }
 
+    // Ensure price has DH prefix
+    let price = formData.price.trim();
+    if (!price.startsWith('DH')) {
+      price = `DH${price}`;
+    }
+
     if (editingProduct) {
-      dispatch(updateProduct({ ...formData, images: validImages, id: editingProduct.id }));
+      dispatch(updateProduct({ ...formData, price, images: validImages, id: editingProduct.id }));
     } else {
-      dispatch(addProduct({ ...formData, images: validImages }));
+      dispatch(addProduct({ ...formData, price, images: validImages }));
     }
 
     handleCloseModal();
