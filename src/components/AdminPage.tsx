@@ -515,7 +515,7 @@ export function AdminPage() {
                       name="price"
                       value={formData.price}
                       onChange={handleChange}
-                      placeholder="$195"
+                      placeholder="DH195"
                       className="w-full px-4 py-3 border border-black/20 focus:border-black outline-none"
                       required
                     />

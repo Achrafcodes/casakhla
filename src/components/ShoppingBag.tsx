@@ -41,7 +41,7 @@ export function ShoppingBag() {
   /* -------------------- HELPERS -------------------- */
   const calculateTotal = () =>
     items.reduce((total, item) => {
-      const price = parseFloat(item.price.replace('$', ''));
+      const price = parseFloat(item.price.replace('DH', ''));
       return total + price * item.quantity;
     }, 0);
 
@@ -87,7 +87,7 @@ export function ShoppingBag() {
           image: item.images[0],
           category: item.category,
         })),
-        totalAmount: `$${calculateTotal().toFixed(2)}`,
+        totalAmount: `DH${calculateTotal().toFixed(2)}`,
         status: 'pending',
         paymentMethod: 'pending',
         createdAt: Timestamp.now(),
@@ -226,7 +226,6 @@ export function ShoppingBag() {
           <div className="border-t p-6 space-y-4">
             <div className="flex justify-between text-lg">
               <span>Subtotal</span>
-              <span>{calculateTotal().toFixed(2)}</span>
             </div>
 
             <button

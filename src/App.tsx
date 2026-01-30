@@ -56,7 +56,7 @@ function AppContent() {
       images: [whiteHoodie],
       title: 'Signature Oversized Hoodie',
       category: 'Essentials',
-      price: '$185',
+      price: 'DH185',
     },
     {
       id: '2',
@@ -64,7 +64,7 @@ function AppContent() {
       images: [blackHoodie],
       title: 'Graphic Print Hoodie',
       category: 'Streetwear',
-      price: '$195',
+      price: 'DH195',
     },
     {
       id: '3',
@@ -72,7 +72,7 @@ function AppContent() {
       images: [blackHoodieClose],
       title: 'Premium Pullover',
       category: 'Outerwear',
-      price: '$205',
+      price: 'DH205',
     },
     {
       id: '4',
@@ -80,7 +80,7 @@ function AppContent() {
       images: [whiteHoodie],
       title: 'Limited Edition Drop',
       category: 'Limited Edition',
-      price: '$225',
+      price: 'DH225',
     },
   ];
 
