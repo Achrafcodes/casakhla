@@ -37,7 +37,7 @@ export function Hero({ image = HERO_IMAGE }: HeroProps) {
           animation: revealFromBottom 1s ease-out forwards;
         }
       `}</style>
-      {/* Background Image */}
+      {/* Background dfd Image */}
       <div className="absolute inset-0 z-0 hero-image overflow-hidden">
         <LazyImage
           src={image}
