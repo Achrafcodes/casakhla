@@ -16,6 +16,7 @@ import {
   clearCart,
 } from '../store/cartSlice';
 import { auth } from '../lib/firebase';
+import { LazyImage } from './LazyImage';
 import {
   collection,
   addDoc,
@@ -156,11 +157,15 @@ export function ShoppingBag() {
                   key={`${item.id}-${item.selectedSize}`}
                   className="flex gap-4 border-b pb-6"
                 >
-                  <img
-                    src={item.images[0]}
-                    alt={item.title}
-                    className="w-24 h-24 object-cover bg-gray-100"
-                  />
+                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0 overflow-hidden">
+                    <LazyImage
+                      src={item.images[0]}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      skeletonClassName="w-full h-full"
+                      animationDuration={300}
+                    />
+                  </div>
 
                   <div className="flex-1">
                     <div className="flex justify-between">

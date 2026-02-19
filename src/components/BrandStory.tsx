@@ -1,4 +1,5 @@
 import brandImage from 'figma:asset/877531fbc80ee4389c993063c1dd6ca4982ac9d4.png';
+import { LazyImage } from './LazyImage';
 
 export function BrandStory() {
   return (
@@ -35,10 +36,12 @@ export function BrandStory() {
           {/* Image */}
           <div className="relative">
             <div className="aspect-[3/4] overflow-hidden">
-              <img
+              <LazyImage
                 src={brandImage}
                 alt="Brand story"
                 className="w-full h-full object-cover"
+                skeletonClassName="w-full h-full"
+                animationDuration={400}
               />
             </div>
             {/* Decorative element */}

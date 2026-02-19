@@ -1,5 +1,6 @@
 import whiteHoodie from 'figma:asset/877531fbc80ee4389c993063c1dd6ca4982ac9d4.png';
 import blackHoodie from 'figma:asset/260c21762636574db191d400b7bf3ac3faee81ce.png';
+import { LazyImage } from './LazyImage';
 
 interface CollectionCardProps {
   image: string;
@@ -12,10 +13,12 @@ function CollectionCard({ image, title, description, onClick }: CollectionCardPr
   return (
     <div onClick={onClick} className="group cursor-pointer relative overflow-hidden">
       <div className="aspect-[4/5] overflow-hidden">
-        <img
+        <LazyImage
           src={image}
           alt={title}
           className="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+          skeletonClassName="w-full h-full grayscale"
+          animationDuration={400}
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
@@ -70,9 +73,9 @@ export function Collections({ onNavigate }: CollectionsProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {collections.map((collection, index) => (
-            <CollectionCard 
-              key={index} 
-              {...collection} 
+            <CollectionCard
+              key={index}
+              {...collection}
               onClick={() => handleCollectionClick(collection.category)}
             />
           ))}

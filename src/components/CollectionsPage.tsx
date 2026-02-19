@@ -4,6 +4,7 @@ import { addToCart, openCart } from '../store/cartSlice';
 import { ShoppingBag, X } from 'lucide-react';
 import { ProductCarousel } from './ui/ProductCarousel';
 import SimpleSlider from './ui/slid';
+import { LazyImage } from './LazyImage';
 
 interface CollectionsPageProps {
   initialCategory?: string;
@@ -90,10 +91,12 @@ export function CollectionsPage({ initialCategory }: CollectionsPageProps) {
                     onClick={() => setSelectedProduct(product.id)}
                   >
                     <div className="aspect-[3/4]">
-                      <img
+                      <LazyImage
                         src={product.images[0]}
                         alt={product.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        skeletonClassName="w-full h-full"
+                        animationDuration={350}
                       />
                     </div>
 

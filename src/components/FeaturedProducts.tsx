@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addToCart, openCart } from '../store/cartSlice';
 import { ShoppingBag, X } from 'lucide-react';
 import SimpleSlider from './ui/slid';
+import { LazyImage } from './LazyImage';
 
 interface Product {
   id: string;
@@ -28,10 +29,12 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
         onClick={onClick}
       >
         <div className="aspect-[3/4]">
-          <img
+          <LazyImage
             src={product.image}
             alt={product.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            skeletonClassName="w-full h-full"
+            animationDuration={350}
           />
         </div>
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />

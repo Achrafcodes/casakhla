@@ -4,6 +4,7 @@ import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addProduct, updateProduct, deleteProduct } from '../store/productsSlice';
 import { fetchOrders, updateOrderStatus } from '../store/ordersSlice';
 import { getAllMessages, deleteContactMessage } from '../lib/messagesService';
+import { LazyImage } from './LazyImage';
 import type { Product } from '../store/productsSlice';
 import type { ContactMessage } from '../lib/messagesService';
 
@@ -286,11 +287,13 @@ export function AdminPage() {
                       <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gray-100 flex-shrink-0">
-                              <img
+                            <div className="w-16 h-16 bg-gray-100 flex-shrink-0 overflow-hidden">
+                              <LazyImage
                                 src={product.images[0]}
                                 alt={product.title}
                                 className="w-full h-full object-cover"
+                                skeletonClassName="w-full h-full"
+                                animationDuration={300}
                               />
                             </div>
                             <div>

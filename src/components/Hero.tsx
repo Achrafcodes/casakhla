@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { LazyImage } from './LazyImage';
 
 const HERO_IMAGE = 'https://pixabay.com/get/g228af343d23f3dd410e5a1320a3c96c6953566ec0301b0ac0ea98f4eaae60617ac8973fdf74bbcadf944d10017b2856c63c249955a36f2102d4894112bed50e2b9aea8b6f3d821d8353ade0e6e90762d_1920.jpg';
 
@@ -9,21 +11,46 @@ interface HeroProps {
 
 export function Hero({ image = HERO_IMAGE }: HeroProps) {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <style>{`
+        @keyframes revealFromBottom {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .hero-content {
+          animation: revealFromBottom 0.8s ease-out forwards;
+        }
+        .hero-image {
+          animation: revealFromBottom 1s ease-out forwards;
+        }
+      `}</style>
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img
+      <div className="absolute inset-0 z-0 hero-image overflow-hidden">
+        <LazyImage
           src={image}
           alt="Fashion hero"
-          className="w-full h-full object-cover object-center"
-          loading="lazy"
+          className="w-full h-full object-cover object-center block"
+          skeletonClassName="w-full h-full"
+          animationDuration={500}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
+      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full hero-content">
         <div className="max-w-3xl">
           {/* <div className="text-white/80 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-4 sm:mb-6 text-xs sm:text-sm">
             Spring / Summer 2026
@@ -59,7 +86,7 @@ export function Hero({ image = HERO_IMAGE }: HeroProps) {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:block">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:block ">
         <div className="w-[1px] h-16 bg-white/40 animate-pulse" />
       </div>
     </section>
