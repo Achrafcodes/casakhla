@@ -1,12 +1,13 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from 'figma:asset/67015349024f85d37529a44dace6b22274d9ebac.png';
+
+const HERO_IMAGE = 'https://pixabay.com/get/g228af343d23f3dd410e5a1320a3c96c6953566ec0301b0ac0ea98f4eaae60617ac8973fdf74bbcadf944d10017b2856c63c249955a36f2102d4894112bed50e2b9aea8b6f3d821d8353ade0e6e90762d_1920.jpg';
 
 interface HeroProps {
   image?: string;
 }
 
-export function Hero({ image = heroImage }: HeroProps) {
+export function Hero({ image = HERO_IMAGE }: HeroProps) {
   const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -16,6 +17,7 @@ export function Hero({ image = heroImage }: HeroProps) {
           src={image}
           alt="Fashion hero"
           className="w-full h-full object-cover object-center"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
       </div>
