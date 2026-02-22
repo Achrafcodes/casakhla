@@ -152,7 +152,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                             <button
                               key={size}
                               onClick={() => setSelectedSize(size)}
-                              className={`py-5 px-6 text-base font-semibold border transition-colors ${selectedSize === size
+                              className={`py-6 px-6 text-base font-semibold border transition-colors ${selectedSize === size
                                 ? 'bg-black text-white border-black'
                                 : 'border-black/20 hover:border-black'
                                 }`}

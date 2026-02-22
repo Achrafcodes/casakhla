@@ -65,6 +65,18 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
+export const deleteOrder = createAsyncThunk(
+  'orders/deleteOrder',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await ordersService.deleteOrder(id);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
@@ -111,6 +123,12 @@ const ordersSlice = createSlice({
         if (order) {
           order.status = action.payload.status;
         }
+      });
+
+    // Delete order
+    builder
+      .addCase(deleteOrder.fulfilled, (state, action) => {
+        state.items = state.items.filter(o => o.id !== action.payload);
       });
   },
 });

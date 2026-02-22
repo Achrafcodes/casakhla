@@ -1,9 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { LazyImage } from './LazyImage';
 
-const HERO_IMAGE = 'https://pixabay.com/get/g228af343d23f3dd410e5a1320a3c96c6953566ec0301b0ac0ea98f4eaae60617ac8973fdf74bbcadf944d10017b2856c63c249955a36f2102d4894112bed50e2b9aea8b6f3d821d8353ade0e6e90762d_1920.jpg';
+const HERO_IMAGE = '/hero.jpeg';
 
 interface HeroProps {
   image?: string;
@@ -39,12 +38,13 @@ export function Hero({ image = HERO_IMAGE }: HeroProps) {
       `}</style>
       {/* Background dfd Image */}
       <div className="absolute inset-0 z-0 hero-image overflow-hidden">
-        <LazyImage
+        <img
           src={image}
           alt="Fashion hero"
           className="w-full h-full object-cover object-center block"
-          skeletonClassName="w-full h-full"
-          animationDuration={500}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
       </div>

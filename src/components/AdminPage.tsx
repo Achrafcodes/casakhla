@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X, Package, ShoppingCart, Mail } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { addProduct, updateProduct, deleteProduct } from '../store/productsSlice';
-import { fetchOrders, updateOrderStatus } from '../store/ordersSlice';
+import { fetchOrders, updateOrderStatus, deleteOrder } from '../store/ordersSlice';
 import { getAllMessages, deleteContactMessage } from '../lib/messagesService';
 import { LazyImage } from './LazyImage';
 import type { Product } from '../store/productsSlice';
@@ -170,6 +170,12 @@ export function AdminPage() {
 
   const handleOrderStatusChange = (orderId: string, status: any) => {
     dispatch(updateOrderStatus({ id: orderId, status }));
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    if (confirm('Are you sure you want to delete this order?')) {
+      dispatch(deleteOrder(orderId));
+    }
   };
 
   const categories = ['Essentials', 'Streetwear', 'Outerwear', 'Limited Edition'];
@@ -391,8 +397,17 @@ export function AdminPage() {
                         <option value="cancelled">Cancelled</option>
                       </select>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(order.createdAt?.toDate?.() || order.createdAt).toLocaleDateString()}
+                    <div className="flex items-center gap-4">
+                      <div className="text-sm text-gray-500">
+                        {new Date(order.createdAt?.toDate?.() || order.createdAt).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteOrder(order.id)}
+                        className="p-2 hover:bg-red-50 text-red-600 rounded transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
