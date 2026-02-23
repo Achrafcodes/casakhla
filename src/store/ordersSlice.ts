@@ -127,8 +127,17 @@ const ordersSlice = createSlice({
 
     // Delete order
     builder
+      .addCase(deleteOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(deleteOrder.fulfilled, (state, action) => {
+        state.loading = false;
         state.items = state.items.filter(o => o.id !== action.payload);
+      })
+      .addCase(deleteOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

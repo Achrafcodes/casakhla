@@ -19,12 +19,12 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Orders collection - guests and authenticated users can create, admins can read/update
+    // Orders collection - guests and authenticated users can create, admins can read/update/delete
     match /orders/{document=**} {
       allow create: if true;  // Anyone can create orders (guests or authenticated)
       allow read: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-      allow update: if request.auth != null && 
+      allow update, delete: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 

@@ -4,6 +4,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy,
   Timestamp
@@ -88,10 +89,7 @@ export const updateOrderStatus = async (
 export const deleteOrder = async (id: string): Promise<void> => {
   try {
     const docRef = doc(db, ORDERS_COLLECTION, id);
-    await updateDoc(docRef, {
-      status: 'cancelled',
-      updatedAt: Timestamp.now()
-    });
+    await deleteDoc(docRef);
   } catch (error) {
     console.error('Error deleting order:', error);
     throw new Error('Failed to delete order');
